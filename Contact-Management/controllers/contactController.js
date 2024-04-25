@@ -4,10 +4,16 @@
 
 
 //When ever we use Mongoose for MongoDB call it returns us a promise and to handle that 
-// We need async functions, So We have added Asyn to all our arroe functions
+// We need async functions, So We have added Asyn to all our arrow functions
 
 //But async function need  TRY CATCH functionality to catch errors and resolve them
 //For this we EXPRESS ASYNC handler
+//The express-async-handler package is commonly used in Express.js applications to handle asynchronous functions and middleware errors in a more streamlined manner.
+const asyncHandler = require("express-async-handler");
+
+
+// imports the Mongoose model for the Contact schema that I defined earlier
+const Contact = require("../models/contactModels");
 
 
 //@desc Get Contact
@@ -15,54 +21,59 @@
 //@access public
 //req: Represents the request object containing information about the HTTP request.
 //res: Represents the response object used to send back an HTTP response.
-const getContacts = async (req,res)=>{
+const getContacts = asyncHandler(async (req, res) => {
     console.log("Sending Routes of Contacts from Route Folder");
-    res.status(200).json({message: "Get All Contacts"});
-};
+    //retrieve all documents from the "Contact" collection in the database.
+    const contacts = await Contact.find();
+    res.status(200).json({ contacts });
+});
 
 //@desc POST Contact
 //@route POST/api/contact
 //@access public
-const createContact = async (req,res)=>{
+const createContact = asyncHandler(async (req, res) => {
     console.log("Creating Contact");
-
     //handling error for Body
-    const {name, email, phone} = req.body;
+    const { name, email, phone } = req.body;
 
-    if(!name || !email || !phone){
-        console.log(name,email,phone);
+    if (!name || !email || !phone) {
+        console.log(name, email, phone);
         res.status(400)
         throw new Error("All body fields are Mandatory");
     }
 
-    console.log("Received Body from Request", req.body)
+    //The contact variable will contain the newly created contact document, including its unique identifier (_id) assigned by MongoDB
+    //By using await with Contact.create(), the program waits for the creation operation to complete before proceeding. This is important when working with asynchronous operations
+    const contact = await Contact.create({ name, email, phone });
+
+    console.log("Contact Created Successfully");
 
 
-    res.status(200).json({message: "Create Contact"});
-};
+    res.status(200).json({ contact });
+});
 
 //@desc PUT Contact
 //@route PUT/api/contact/:id
 //@access public
-const updateContact = async (req,res)=>{
+const updateContact = asyncHandler(async (req, res) => {
     console.log("Updating Contact");
     //${req.params.id}: This syntax is used to access the value of the id parameter in the URL
-    res.status(200).json({message: `Updating Contact For ID ${req.params.id}`});
-};
+    res.status(200).json({ message: `Updating Contact For ID ${req.params.id}` });
+});
 
 
 //@desc DELETE Contact
 //@route DELETE/api/contact/:id
 //@access public
-const deleteContact = async (req,res)=>{
+const deleteContact = asyncHandler(async (req, res) => {
     console.log("Deleting Contact");
-    res.status(200).json({message: `deleteing contact for ID ${req.params.id}`});
-};
+    res.status(200).json({ message: `deleteing contact for ID ${req.params.id}` });
+});
 //@desc Get Contact
 //@route GET/api/contact:id
 //@access public
-const getContact = async  (req,res)=>{
+const getContact = asyncHandler(async (req, res) => {
     console.log("Sending Contact based on ID")
     res.status(200).json(`Sending Contact for ID ${id}`);
-};
-module.exports = {getContacts, createContact, updateContact, deleteContact, getContact};
+});
+module.exports = { getContacts, createContact, updateContact, deleteContact, getContact };
