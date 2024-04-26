@@ -23,12 +23,14 @@ app.use(express.json());
 
 
 //middleware function responsible for handling errors that occur during the processing of requests. It typically takes four parameters: err, req, res, and next
-app.use(errorHandler);
+
 
 //sets up a middleware in the Express application using the app.use() method. 
 //Middleware functions are functions that have access to the request object (req), the response object (res), and the next middleware function in the application’s request-response cycle.
 app.use('/api/contacts/', require('./routes/contactRoutes'));
 
+//middleware function responsible for handling errors that occur during the processing of requests. It typically takes four parameters: err, req, res, and next
+app.use(errorHandler);  // be careful where you place your middleware it should follow a logic of data flow
 
 // Start the server and listen for incoming connections on the specified port
 app.listen(port, ()=>{
