@@ -2,6 +2,7 @@
 //For this we EXPRESS ASYNC handler
 //The express-async-handler package is commonly used in Express.js applications to handle asynchronous functions and middleware errors in a more streamlined manner.
 const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
 const brcypt = require("bcrypt");
 const User = require("../models/userModel");
 
@@ -52,6 +53,28 @@ const registerUser = asyncHandler(async (req,res) =>{
 //@route POST/api/user/login
 //@access public
 const loginUser = asyncHandler(async(req,res)=>{
+    const {email, password} = req.body;
+    if(!email || !password){
+        res.status(400);
+        throw new Error("All Fields are Mandatory");
+    }
+    //checking if Password gets matched or user exist, would be using SHORT CIRCUIT
+    const user = await User.findOne({email});
+    if(user && await brcypt.compare(password,user.password)){//compare a plaintext password provided by a user with a hashed password stored in your database (typically retrieved from the user object)
+        //if user gets verified we provide him an access token
+        const accessToken = jwt.sign({
+            user:{
+                username: user.username,
+                email: user.email,
+                id: user.id
+            }, 
+        }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "1m" });
+        res.status(200).json({accessToken})
+    } else{
+        //Validation has failed => Trying for Unauthorized Access
+        res.status(401);
+        throw new Error("Failed to get Authorized, email or password invalid.");
+    }
     res.status(200).json({message:"User Logged in Successfully"});
 });
 
