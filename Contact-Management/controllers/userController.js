@@ -61,7 +61,7 @@ const loginUser = asyncHandler(async(req,res)=>{
     //checking if Password gets matched or user exist, would be using SHORT CIRCUIT
     const user = await User.findOne({email});
     if(user && await brcypt.compare(password,user.password)){//compare a plaintext password provided by a user with a hashed password stored in your database (typically retrieved from the user object)
-        //if user gets verified we provide him an access token
+        //if user gets verified we provide him an access token 
         const accessToken = jwt.sign({
             user:{
                 username: user.username,
