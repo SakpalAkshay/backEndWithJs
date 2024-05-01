@@ -2,6 +2,13 @@ const mongoose = require("mongoose");
 
 //This code defines a Mongoose schema for a contact. Inside the schema definition, you specify the fields (properties) of the contact document along with their types and validation rules.
 const contactSchema =  mongoose.Schema({
+    //we added user id so that specifuic user can update the contact
+    user_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "User",
+
+    },
 
     //type property specifying the data type (String in this case) and a required property indicating that the field is required for document validation
     name: {type : String, required: [true,"Please Add Contact Name"],
